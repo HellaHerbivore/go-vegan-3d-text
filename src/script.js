@@ -9,7 +9,11 @@ import { TextGeometry } from 'three/examples/jsm/Addons.js';
  * Base
  */
 // Debug
-const gui = new GUI()
+ const gui = new GUI({
+    width: Math.min(window.innerWidth * 0.3, 300)
+ });
+ gui.hide();
+ 
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -44,6 +48,28 @@ const _donutTextureMatCap = textureLoader.load("/textures/matcaps/9.png");
 _donutTextureMatCap.colorSpace = THREE.SRGBColorSpace;
 
 
+// Background Gradient
+const createGradientTexture = () =>
+{
+    const canvas = document.createElement("canvas");
+    canvas.width = 2;
+    canvas.height = 256;
+
+    const ctx = canvas.getContext("2d");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+
+    gradient.addColorStop(0, "#9e5510"); // top color
+    gradient.addColorStop(1, "#f0b45a"); // bottom color
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 2, 256);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+}
+
+scene.background = createGradientTexture();
+
 /**
  * Fonts
  */
@@ -51,16 +77,16 @@ const fontLoader = new FontLoader();
 
 fontLoader.load
 (
-    "/fonts/Parkinsans Light_Regular.json",
+    "/fonts/helvetiker_regular.typeface.json",
     (font) =>
     {
         const textGeometry = new TextGeometry(
-            "Go Vegan",
+            "Dear Wife, Stay Vegan :)",
             {
                 font: font,
                 size: 0.5,
                 depth: 0.2,
-                curveSegments: 5,
+                curveSegments: 6,
                 bevelEnabled: true,
                 bevelThickness: 0.03,
                 bevelSize: 0.02,
@@ -131,11 +157,11 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 
 
-const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 12, 48);
+const donutGeometry = new THREE.TorusGeometry(0.005, 0.2, 12, 48);
 const donutMaterial = new THREE.MeshMatcapMaterial({matcap: _donutTextureMatCap});
 
 
-for(let i = 0; i < 1000; i++)
+for(let i = 0; i < 500; i++)
 {
     const donutMesh = new THREE.Mesh(donutGeometry, donutMaterial);
 
@@ -153,6 +179,11 @@ for(let i = 0; i < 1000; i++)
     scene.add(donutMesh);
 }
 
+
+/**
+ * Debugger
+ */
+// gui.addColor(donutMaterial, "color");
 
 
 
