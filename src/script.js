@@ -12,7 +12,7 @@ import { TextGeometry } from 'three/examples/jsm/Addons.js';
  const gui = new GUI({
     width: Math.min(window.innerWidth * 0.3, 300)
  });
-//  gui.hide();
+ gui.hide();
  
 
 // Canvas
@@ -32,7 +32,7 @@ const scene = new THREE.Scene()
  * Lights
  */
 const ambientLight = new THREE.AmbientLight();
-ambientLight.color = new THREE.Color("#ffffe2");
+ambientLight.color = new THREE.Color("#ffffff");
 ambientLight.intensity = 1.9;
 scene.add(ambientLight);
 
@@ -50,13 +50,25 @@ _textTextureGradient.magFilter = THREE.NearestFilter;
 _textTextureGradient.generateMipmaps = false;
 
 const texturePaths = [
+    "textures/animals/ai-lobster.png",
     "textures/animals/ai-salmon.png",
+    "textures/animals/ai-shrimp.png",
+    "textures/animals/ai-tuna.png",
     "/textures/animals/bounding-beagle.jpg",
     "/textures/animals/content-pig.jpg",
+    "/textures/animals/curious-lamb.jpg",
+    "/textures/animals/curious-lamb-2.jpg",
+    "/textures/animals/cute-kittens.jpg",
+    "/textures/animals/friendly-elephants.jpg",
+    "/textures/animals/goofy-fox.jpg",
     "/textures/animals/hen-sanctuary.jpg",
     "/textures/animals/horse.jpg",
+    "/textures/animals/jolly-goose.jpg",
+    "/textures/animals/pig-puppies.jpg",
+    "/textures/animals/playful-cow.jpg",
     "/textures/animals/red-fox.jpg",
     "/textures/animals/relaxed-goat.jpg",
+    "/textures/animals/silly-chimps.jpg",
     "/textures/animals/sprawling-tiger.jpg",
     "/textures/animals/two-calves.jpg"
 ];
@@ -73,8 +85,8 @@ const animalMaterials = animalTextures.map(texture =>
 
 // Background Gradient
 const gradientParams = {
-    topColor: "#fce197",
-    bottomColor: "#8fa66e"
+    topColor: "#d7ebfe",
+    bottomColor: "#fffdc2"
 };
 
 const createGradientTexture = (topColor, bottomColor) =>
@@ -125,7 +137,7 @@ fontLoader.load
     (font) =>
     {
         const textGeometry = new TextGeometry(
-            "Join team vegan for them <3",
+            "Join team \n  VEGAN \n   for them <3",
             {
                 font: font,
                 size: 1,
@@ -145,7 +157,7 @@ fontLoader.load
         textMaterial.gradientMap = _textTextureGradient;
         textMaterial.wireframe = false;
         textMaterial.depthTest = false;
-        textMaterial.color = new THREE.Color("#90fdae");
+        textMaterial.color = new THREE.Color("rgb(0, 255, 60)");
         const textMesh = new THREE.Mesh(textGeometry, textMaterial);
         textMesh.renderOrder = 2;
 
@@ -157,8 +169,8 @@ fontLoader.load
         textOutlineMaterial.depthTest = false;
         const textOutlineMesh = new THREE.Mesh(textGeometry, textOutlineMaterial);
         textOutlineMesh.scale.x = 1.002;
-        textOutlineMesh.scale.y = 1.1;
-        textOutlineMesh.scale.z = 1.1;
+        textOutlineMesh.scale.y = 1.02;
+        textOutlineMesh.scale.z = 1.05;
         textOutlineMesh.renderOrder = textMesh.renderOrder -1;
 
         scene.add(textMesh, textOutlineMesh);
@@ -232,18 +244,29 @@ const planeGeometry = new THREE.PlaneGeometry(2, 2);
 for(let i = 0; i < 100; i++)
 {
     // randomly select a material from the pool
-    const randomAnimalMaterial = animalMaterials[Math.floor(Math.random() * animalMaterials.length)];
-    const animalPlaneMesh = new THREE.Mesh(planeGeometry, randomAnimalMaterial); 
+    const selectedAnimalMaterial = animalMaterials[i % animalMaterials.length];
+    const animalPlaneMesh = new THREE.Mesh(planeGeometry, selectedAnimalMaterial); 
     
 
-    animalPlaneMesh.position.x = (Math.random() - 0.5) * 10;
-    animalPlaneMesh.position.y = (Math.random() - 0.5) * 10;
-    animalPlaneMesh.position.z = (Math.random() - 0.5) * 10;
+    animalPlaneMesh.position.x = Math.floor(((Math.random() - 0.5) * 15), 5);
+    animalPlaneMesh.position.y = Math.floor(((Math.random() - 0.5) * 15), 5);
+    animalPlaneMesh.position.z = (Math.random() - 0.5) * 5;
 
 
-    const randomScale = Math.random();
-
+    const randomScale = Math.random() + 0.1;
     animalPlaneMesh.scale.set(randomScale, randomScale, randomScale);
+
+    // add border
+    const edges = new THREE.EdgesGeometry(planeGeometry);
+    const borderMaterial = new THREE.LineBasicMaterial({
+        color: "#1b1702", 
+        linewidth: 2
+    });
+    const border = new THREE.LineSegments(edges, borderMaterial);
+    border.position.z = 0.01;
+
+    // add border as child so transform is inherited
+    animalPlaneMesh.add(border);
 
     scene.add(animalPlaneMesh);
 }
