@@ -12,7 +12,7 @@ import { TextGeometry } from 'three/examples/jsm/Addons.js';
  const gui = new GUI({
     width: Math.min(window.innerWidth * 0.3, 300)
  });
- gui.hide();
+//  gui.hide();
  
 
 // Canvas
@@ -31,25 +31,53 @@ const scene = new THREE.Scene()
 /**
  * Lights
  */
-// const ambientLight = new THREE.AmbientLight();
-// ambientLight.color = new THREE.Color("#ffffe2");
-// ambientLight.intensity = 1.9;
-// scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight();
+ambientLight.color = new THREE.Color("#ffffe2");
+ambientLight.intensity = 1.9;
+scene.add(ambientLight);
 
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
 
-const _textTextureMatCap = textureLoader.load("/textures/matcaps/7.png");
+const _textTextureMatCap = textureLoader.load("/textures/matcaps/11.png");
 _textTextureMatCap.colorSpace = THREE.SRGBColorSpace;
 
-const _donutTextureMatCap = textureLoader.load("/textures/matcaps/9.png");
-_donutTextureMatCap.colorSpace = THREE.SRGBColorSpace;
+const _textTextureGradient = textureLoader.load("/textures/gradients/3.jpg");
+_textTextureGradient.minFilter = THREE.NearestFilter;
+_textTextureGradient.magFilter = THREE.NearestFilter;
+_textTextureGradient.generateMipmaps = false;
+
+const texturePaths = [
+    "textures/animals/ai-salmon.png",
+    "/textures/animals/bounding-beagle.jpg",
+    "/textures/animals/content-pig.jpg",
+    "/textures/animals/hen-sanctuary.jpg",
+    "/textures/animals/horse.jpg",
+    "/textures/animals/red-fox.jpg",
+    "/textures/animals/relaxed-goat.jpg",
+    "/textures/animals/sprawling-tiger.jpg",
+    "/textures/animals/two-calves.jpg"
+];
+
+const animalTextures = texturePaths.map(path => textureLoader.load(path));
+const animalMaterials = animalTextures.map(texture =>
+    new THREE.MeshBasicMaterial({
+        map: texture,
+        // side: THREE.DoubleSide
+    })
+);
+
 
 
 // Background Gradient
-const createGradientTexture = () =>
+const gradientParams = {
+    topColor: "#fce197",
+    bottomColor: "#8fa66e"
+};
+
+const createGradientTexture = (topColor, bottomColor) =>
 {
     const canvas = document.createElement("canvas");
     canvas.width = 2;
@@ -58,8 +86,8 @@ const createGradientTexture = () =>
     const ctx = canvas.getContext("2d");
     const gradient = ctx.createLinearGradient(0, 0, 0, 256);
 
-    gradient.addColorStop(0, "#9e5510"); // top color
-    gradient.addColorStop(1, "#f0b45a"); // bottom color
+    gradient.addColorStop(0, topColor);    // top color
+    gradient.addColorStop(1, bottomColor); // bottom color
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 2, 256);
@@ -67,8 +95,24 @@ const createGradientTexture = () =>
     const texture = new THREE.CanvasTexture(canvas);
     return texture;
 }
+scene.background = createGradientTexture(gradientParams.topColor, gradientParams.bottomColor);
 
-scene.background = createGradientTexture();
+// Add gradient to GUI
+const backgroundFolder = gui.addFolder('Background Gradient');
+
+backgroundFolder.addColor(gradientParams, 'topColor')
+    .name('Top Color')
+    .onChange(() => {
+        scene.background = createGradientTexture(gradientParams.topColor, gradientParams.bottomColor);
+    });
+
+backgroundFolder.addColor(gradientParams, 'bottomColor')
+    .name('Bottom Color')
+    .onChange(() => {
+        scene.background = createGradientTexture(gradientParams.topColor, gradientParams.bottomColor);
+    });
+
+backgroundFolder.open(); // Optional: start with folder open
 
 /**
  * Fonts
@@ -81,11 +125,11 @@ fontLoader.load
     (font) =>
     {
         const textGeometry = new TextGeometry(
-            "Dear Wife, Stay Vegan :)",
+            "Join team vegan for them <3",
             {
                 font: font,
-                size: 0.5,
-                depth: 0.2,
+                size: 1,
+                depth: 0.12,
                 curveSegments: 6,
                 bevelEnabled: true,
                 bevelThickness: 0.03,
@@ -96,11 +140,28 @@ fontLoader.load
         )
         textGeometry.center();
 
-        const textMaterial = new THREE.MeshMatcapMaterial();
-        textMaterial.matcap = _textTextureMatCap;
+        // Main text material
+        const textMaterial = new THREE.MeshToonMaterial();
+        textMaterial.gradientMap = _textTextureGradient;
         textMaterial.wireframe = false;
-        const text = new THREE.Mesh(textGeometry, textMaterial);
-        scene.add(text);
+        textMaterial.depthTest = false;
+        textMaterial.color = new THREE.Color("#90fdae");
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        textMesh.renderOrder = 2;
+
+        // Outline text material
+        const textOutlineMaterial = new THREE.MeshBasicMaterial({
+            color: "#472b15",
+            side: THREE.BackSide
+        });
+        textOutlineMaterial.depthTest = false;
+        const textOutlineMesh = new THREE.Mesh(textGeometry, textOutlineMaterial);
+        textOutlineMesh.scale.x = 1.002;
+        textOutlineMesh.scale.y = 1.1;
+        textOutlineMesh.scale.z = 1.1;
+        textOutlineMesh.renderOrder = textMesh.renderOrder -1;
+
+        scene.add(textMesh, textOutlineMesh);
     }
 )
 
@@ -135,12 +196,16 @@ window.addEventListener('resize', () =>
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 1
 camera.position.y = 1
-camera.position.z = 2
+camera.position.z = 8
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+controls.enableDamping = true;
+controls.minAzimuthAngle = -Math.PI / 4;
+controls.maxAzimuthAngle = Math.PI / 4;
+controls.minPolarAngle = -Math.PI / 2;
+controls.maxPolarAngle = Math.PI / 2;
 
 /**
  * Renderer
@@ -157,26 +222,30 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 
 
-const donutGeometry = new THREE.TorusGeometry(0.005, 0.2, 12, 48);
-const donutMaterial = new THREE.MeshMatcapMaterial({matcap: _donutTextureMatCap});
+const planeGeometry = new THREE.PlaneGeometry(2, 2);
+// const planeMaterial = new THREE.MeshBasicMaterial({
+//     map: foxTexture,
+//     side: THREE.DoubleSide
+// });
 
 
-for(let i = 0; i < 500; i++)
+for(let i = 0; i < 100; i++)
 {
-    const donutMesh = new THREE.Mesh(donutGeometry, donutMaterial);
+    // randomly select a material from the pool
+    const randomAnimalMaterial = animalMaterials[Math.floor(Math.random() * animalMaterials.length)];
+    const animalPlaneMesh = new THREE.Mesh(planeGeometry, randomAnimalMaterial); 
+    
 
-    donutMesh.position.x = (Math.random() - 0.5) * 20;
-    donutMesh.position.y = (Math.random() - 0.5) * 20;
-    donutMesh.position.z = (Math.random() - 0.5) * 20;
+    animalPlaneMesh.position.x = (Math.random() - 0.5) * 10;
+    animalPlaneMesh.position.y = (Math.random() - 0.5) * 10;
+    animalPlaneMesh.position.z = (Math.random() - 0.5) * 10;
 
-    donutMesh.rotation.x = Math.random() * Math.PI;
-    donutMesh.rotation.y = Math.random() * Math.PI;
 
     const randomScale = Math.random();
 
-    donutMesh.scale.set(randomScale, randomScale, randomScale)
+    animalPlaneMesh.scale.set(randomScale, randomScale, randomScale);
 
-    scene.add(donutMesh);
+    scene.add(animalPlaneMesh);
 }
 
 
