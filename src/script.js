@@ -73,7 +73,12 @@ const texturePaths = [
     "/textures/animals/two-calves.jpg"
 ];
 
-const animalTextures = texturePaths.map(path => textureLoader.load(path));
+const animalTextures = texturePaths.map(path => {
+    const texture = textureLoader.load(path);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+});
+
 const animalMaterials = animalTextures.map(texture =>
     new THREE.MeshBasicMaterial({
         map: texture,
@@ -81,7 +86,7 @@ const animalMaterials = animalTextures.map(texture =>
     })
 );
 
-
+animalTextures.colorSpace = THREE.SRGBColorSpace;
 
 // Background Gradient
 const gradientParams = {
@@ -223,7 +228,8 @@ controls.maxPolarAngle = Math.PI / 2;
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    antialias: true,
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -259,7 +265,7 @@ for(let i = 0; i < 100; i++)
     // add border
     const edges = new THREE.EdgesGeometry(planeGeometry);
     const borderMaterial = new THREE.LineBasicMaterial({
-        color: "#1b1702", 
+        color: "#361c0e", 
         linewidth: 2
     });
     const border = new THREE.LineSegments(edges, borderMaterial);
