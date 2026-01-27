@@ -142,7 +142,7 @@ fontLoader.load
     (font) =>
     {
         const textGeometry = new TextGeometry(
-            "Join team \n  VEGAN \n   for them <3",
+            "The impact of\nyour donation",
             {
                 font: font,
                 size: 1,
