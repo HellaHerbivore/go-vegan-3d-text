@@ -50,27 +50,27 @@ _textTextureGradient.magFilter = THREE.NearestFilter;
 _textTextureGradient.generateMipmaps = false;
 
 const texturePaths = [
-    "textures/animals/ai-lobster.png",
-    "textures/animals/ai-salmon.png",
-    "textures/animals/ai-shrimp.png",
-    "textures/animals/ai-tuna.png",
-    "/textures/animals/bounding-beagle.jpg",
-    "/textures/animals/content-pig.jpg",
-    "/textures/animals/curious-lamb.jpg",
-    "/textures/animals/curious-lamb-2.jpg",
-    "/textures/animals/cute-kittens.jpg",
-    "/textures/animals/friendly-elephants.jpg",
-    "/textures/animals/goofy-fox.jpg",
-    "/textures/animals/hen-sanctuary.jpg",
-    "/textures/animals/horse.jpg",
-    "/textures/animals/jolly-goose.jpg",
-    "/textures/animals/pig-puppies.jpg",
-    "/textures/animals/playful-cow.jpg",
-    "/textures/animals/red-fox.jpg",
-    "/textures/animals/relaxed-goat.jpg",
-    "/textures/animals/silly-chimps.jpg",
-    "/textures/animals/sprawling-tiger.jpg",
-    "/textures/animals/two-calves.jpg"
+    "textures/animals/ai-lobster.webp",
+    "textures/animals/ai-salmon.webp",
+    "textures/animals/ai-shrimp.webp",
+    "textures/animals/ai-tuna.webp",
+    "/textures/animals/bounding-beagle.webp",
+    "/textures/animals/content-pig.webp",
+    "/textures/animals/curious-lamb.webp",
+    "/textures/animals/curious-lamb-2.webp",
+    "/textures/animals/cute-kittens.webp",
+    "/textures/animals/friendly-elephants.webp",
+    "/textures/animals/goofy-fox.webp",
+    "/textures/animals/hen-sanctuary.webp",
+    "/textures/animals/horse.webp",
+    "/textures/animals/jolly-goose.webp",
+    "/textures/animals/pig-puppies.webp",
+    "/textures/animals/playful-cow.webp",
+    "/textures/animals/red-fox.webp",
+    "/textures/animals/relaxed-goat.webp",
+    "/textures/animals/silly-chimps.webp",
+    "/textures/animals/sprawling-tiger.webp",
+    "/textures/animals/two-calves.webp"
 ];
 
 const animalTextures = texturePaths.map(path => {
